@@ -1,4 +1,5 @@
 mod dragonhelper;
+mod renderer;
 
 struct Point {
     x: i32,
@@ -13,7 +14,7 @@ struct Agent {
 }
 
 fn main() {
-    const ITERATIONS: i32 = 12;
+    const ITERATIONS: i32 = 26;
 
     println!("Processing turns to {ITERATIONS} iterations...");
 
@@ -36,7 +37,7 @@ fn main() {
 
     let mut points: Vec<Point> = vec![];
 
-    for turn in &turns {
+    for turn in &turns { // Agent movement and point rendering
         match agent.direction {
             0 => agent.position.y -= 1,
             1 => agent.position.x += 1,
@@ -76,37 +77,27 @@ fn main() {
     
     println!("Points rendered.");
 
-    let dimensions: Point = Point { 
-        x: agent.max.x.abs() + agent.min.x.abs() + 1, 
+    let dimensions: Point = Point { // Calculated dimensions of image
+        x: agent.max.x.abs() + agent.min.x.abs() + 1, // +1 to avoid going out of image by 1
         y: agent.max.y.abs() + agent.min.y.abs() + 1
     };
 
     println!("Image dimensions calculated. ({} x {})", dimensions.x, dimensions.y);
 
-    let mut image: Vec<u8> = Vec::with_capacity((dimensions.x*dimensions.y) as usize);
-    for _ in 0..dimensions.x*dimensions.y {
+    let mut image: Vec<u8> = Vec::with_capacity((dimensions.x*dimensions.y) as usize); // Image data as vector
+    for _ in 0..dimensions.x*dimensions.y { // Initialise
         image.push(0);
     }
 
     for mut point in points {
-        point.x += agent.min.x * -1;
+        point.x += agent.min.x * -1; // Offset points to screen space
         point.y += agent.min.y * -1;
-        println!("x {} y {}", point.x, point.y);
-        image[(point.x+(dimensions.x*point.y)) as usize] = 255;
+        image[(point.x+(dimensions.x*point.y)) as usize] = 255; // Set pixels from points
     }
 
-    let mut count = 0;
-    for pixel in image {
-        match pixel {
-            0 => print!(" "),
-            255 => print!("#"),
-            _ => panic!("Pixel is neither 0 nor 255.")
-        }
+    println!("Image rendered to vector.");
 
-        count += 1;
+    renderer::save_to_tga(dimensions.x, dimensions.y, image);
 
-        if count % dimensions.x == 0 {
-            println!()
-        }
-    }
+    println!("Image saved to output.tga!");
 }

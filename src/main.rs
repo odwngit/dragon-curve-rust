@@ -89,10 +89,12 @@ fn main() {
         image.push(0);
     }
 
-    for mut point in points {
-        point.x += agent.min.x * -1; // Offset points to screen space
-        point.y += agent.min.y * -1;
-        image[(point.x+(dimensions.x*point.y)) as usize] = 255; // Set pixels from points
+    let mut i: u32 = 0;
+    while i < points.len() as u32 {
+        points[i as usize].x += agent.min.x * -1; // Offset points to screen space
+        points[i as usize].y += agent.min.y * -1;
+        image[(points[i as usize].x+(dimensions.x*points[i as usize].y)) as usize] = ((i as f32/points.len() as f32)*255 as f32).round() as u8; // Set pixels from points
+        i += 1;
     }
 
     println!("Image rendered to vector.");

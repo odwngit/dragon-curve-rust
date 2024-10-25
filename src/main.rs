@@ -1,3 +1,5 @@
+use std::io;
+
 mod dragonhelper;
 mod renderer;
 
@@ -14,12 +16,23 @@ struct Agent {
 }
 
 fn main() {
-    const ITERATIONS: i32 = 26;
+    // Thanks, https://users.rust-lang.org/t/how-to-read-an-integer-from-stdin/57538/2 !
+    let mut input_line = String::new();
+    println!("Enter iterations...");
+    io::stdin()
+        .read_line(&mut input_line)
+        .expect("Failed to read line");
+    let iterations: i32 = input_line.trim().parse().expect("Input not an integer.");
 
-    println!("Processing turns to {ITERATIONS} iterations...");
+    if iterations > 29 {
+        println!("Any amount of iterations above 29 is a bad idea for your computer :(");
+        std::process::exit(1);
+    }
+
+    println!("Processing turns to {iterations} iterations...");
 
     let mut turns: Vec<bool> = vec![true]; // true is a right turn, false is a left turn
-    for _ in 0..ITERATIONS {
+    for _ in 0..iterations {
         dragonhelper::iterate_curve(&mut turns);
     }
 
